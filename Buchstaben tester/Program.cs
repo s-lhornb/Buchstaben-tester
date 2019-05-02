@@ -34,7 +34,8 @@ namespace Buchstaben_tester
         static void Main(string[] args)
         {
             string teststring = "";
-            Action Testen = () =>
+
+            while (!teststring.Equals("STOP"))
             {
                 Console.WriteLine("Bitte geben sie einen Text zum Testen ein oder \"STOP\" zum Stoppen des Programms");
                 teststring = Console.ReadLine();
@@ -44,12 +45,7 @@ namespace Buchstaben_tester
                     Console.WriteLine("Test 2 mit LINQ und Lambdas hat {0}doppelten Buchstaben gefunden.", (CharacterTesterLINQ2(teststring) ? "keine " : "mindestens einen "));
                     Console.WriteLine();
                 }
-            };
 
-            while (!teststring.Equals("STOP"))
-            {
-                Testen();
-                
             }
         }
 
@@ -60,12 +56,12 @@ namespace Buchstaben_tester
         /// <returns>Ergebnis, ob String keine doppelten Buchstaben hat: Ture = keine, False = mind. einen</returns>
         private static bool CharacterTesterLINQ1(string s)
         {
-            return (from char chars in Regex.Replace(s.ToLower(), @"[^a-z]", "") //übernimmt den String, welcher hier in Kleinbuchstaben umgewandelt und dann von allen nicht Kleinbuchstaben gereinigt wird. 
-                                                                                 //Das Entfernen der Sonderzeichen könnte auch mit einem Where-Filter durchgeführt werden, welcher vor der group-Methode durchgeführt würde.
-                    group chars by chars into chargroup  // Diese Methode gruppiert alle Buchstaben, bei denen der Buchstabe gleich ist in chargroup.
-                    where chargroup.Count() > 1 // Filtert alle Elemente aus chargroup heraus, die die Bedingung nicht erfüllen, also nicht eine größere Anzahl als 1 haben.
-                    select chargroup) // Gibt den Typ der zurückgegeben Elemente an. Also alle von chargroup, die nicht gefiltert wurden.
-                    .Count() // Zählt alle Elemente (chargroup), die im LINQ-Teil davor gefunden wurden.
+            return (from char chars in s.ToLower() // Die Abfrage beginnt immer mit einer From-Klausel. Es werden alle Elemente vom String in Kleinbuchstaben umgewandelt und dann in den Abfrageausdruck gegeben. Diese werden nun als chars behandelt.
+                    where Char.IsLetter(chars) // In dieser Where-Klausel werden alle Characters herausgefildet, die kein Buchstabe sind. Where-Klauseln werden zum Filtern verwendet.
+                    group chars by chars into chargroup  // Die Group-Klausel gruppiert alle Buchstaben, bei denen der Buchstabe gleich ist, in chargroup.
+                    where chargroup.Count() > 1 // Filtert alle Elemente aus chargroup heraus, die nicht eine größere Anzahl als 1 Element in der Gruppe haben.
+                    select chargroup) // Gibt den Typ der zurückgegeben Elemente an. Also alle von chargroup, die nicht gefiltert wurden. Außerdem muss mit einer Select-Klausel oder einer Group-Klausel geendet werden.
+                    .Count() // Zählt alle Elemente (IGrouping<TKey,TElement>-Objekte), die im LINQ-Teil davor gefunden wurden.
                     .Equals(0); // Überprüft, ob die Anzahl der Elemente gleich 0 ist.
         }
 
@@ -76,10 +72,10 @@ namespace Buchstaben_tester
         /// <returns>Ergebnis, ob String keine doppelten Buchstaben hat: Ture = keine, False = mind. einen</returns>
         private static bool CharacterTesterLINQ2(string s)
         {
-            return Regex.Replace(s.ToLower(), @"[^a-z]", "") //Der String wird in den lower Case geschrieben und es werden alle Elemente herausgefiltert, die keine Kleinbuchstaben sind. 
-                                                             //Das Entfernen der Sonderzeichen könnte nach der Umwandlung in ein Array auch mit einem Where-Filter durchgeführt werden.
-                .GroupBy(chars => chars) //Alle gleiche Buchstaben werden gruppiert.
-                .Where(chargroup => chargroup.Count() > 1) //Alle Gruppen, die nicht mehr als 1 Element haben werden hier herausgefiltert.
+            return s.ToLower() // Alle Buchstaben werden in Kleinbuchstaben umgewandelt.
+                .Where(chr => Char.IsLetter(chr)) // Alle Elemente die kein Buchstabe sind, werden hier gefiltert. "chr" steht hier stellvertetend für alle Character-Elemente aus dem String.
+                .GroupBy(chars => chars) //Alle gleichen Buchstaben werden gruppiert."chars" steht hier für alle nicht gefilterten "chr"s.
+                .Where(chargroup => chargroup.Count() > 1) //Alle Gruppen, die nicht mehr als 1 Element haben, werden hier herausgefiltert.
                 .Count() // Die Anzahl der nicht herausgefilterten Gruppen wird gezählt.
                 .Equals(0); // Es wird geprüft, ob die Anzahl der Gruppen gleich 0 ist.
         }
