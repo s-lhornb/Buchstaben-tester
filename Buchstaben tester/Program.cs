@@ -78,7 +78,6 @@ namespace Buchstaben_tester
         {
             return Regex.Replace(s.ToLower(), @"[^a-z]", "") //Der String wird in den lower Case geschrieben und es werden alle Elemente herausgefiltert, die keine Kleinbuchstaben sind. 
                                                              //Das Entfernen der Sonderzeichen könnte nach der Umwandlung in ein Array auch mit einem Where-Filter durchgeführt werden.
-                .ToCharArray() //Der String wird in ein Character-Array umgewandelt.
                 .GroupBy(chars => chars) //Alle gleiche Buchstaben werden gruppiert.
                 .Where(chargroup => chargroup.Count() > 1) //Alle Gruppen, die nicht mehr als 1 Element haben werden hier herausgefiltert.
                 .Count() // Die Anzahl der nicht herausgefilterten Gruppen wird gezählt.
